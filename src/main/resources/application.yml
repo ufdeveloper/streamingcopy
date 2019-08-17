@@ -3,3 +3,7 @@ helpers:
     s3BucketName: sardalprojects
     s3FilePath: jprofiler_macos_11_0_1.dmg
     s3ExpirationInSeconds: 1800
+  google:
+    bucketName: sardalprojects
+    uploadFileName: jprofiler_macos_11_0_1.dmg
+    initiateResumableUploadBaseUrl: https://www.googleapis.com/upload/storage/v1/

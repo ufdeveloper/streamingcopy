@@ -26,7 +26,7 @@ public class AWSHelper {
 
     private AmazonS3 amazonS3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
 
-    public String getS3SignedUrl() throws URISyntaxException {
+    public String createS3SignedUrl() throws URISyntaxException {
 
         Date s3UrlExpirationDate = Date.from(Instant.now().plusSeconds(Long.valueOf(s3ExpirationInSeconds)));
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(s3BucketName, s3FilePath);
