@@ -51,6 +51,10 @@ public class StreamingCopyServiceImpl implements StreamingCopyService {
 
         uploadFileInChunks(targetUrl, inputChannel, Long.valueOf(sourceContentLength));
 
+        log.info("Successfully copied file");
+
+        inputChannel.close();
+        inputStream.close();
     }
 
     public void uploadFileInChunks(String resumableUploadUrl, ReadableByteChannel s3InputChannel, long fileLengthInBytes) {
@@ -92,8 +96,8 @@ public class StreamingCopyServiceImpl implements StreamingCopyService {
                 inputChannel.read(buffer);
                 buffer.flip(); // Prepare the buffer to be drained
                 chunk.put(buffer);
+                totalBytesRead += buffer.position();
                 buffer.clear(); // Empty buffer to get ready for filling
-                totalBytesRead += buffer.limit();
             }
         } catch (Exception e) {
             log.error("error reading from inputChannel, totalBytesRead={}, error={}", totalBytesRead, e);
