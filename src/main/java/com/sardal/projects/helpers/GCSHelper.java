@@ -24,7 +24,7 @@ public class GCSHelper {
     private String uploadFileName;
     private String initiateResumableUploadBaseUrl;
 
-    public String createResumableUploadUrl(String gcsAccessToken) throws URISyntaxException {
+    public String createResumableUploadUrl(String gcsAccessToken, String contentType, String contentLength) throws URISyntaxException {
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -33,11 +33,11 @@ public class GCSHelper {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", "Bearer " + gcsAccessToken);
-        httpHeaders.add("X-Upload-Content-Type", "audio/wav");
-        httpHeaders.add("X-Upload-Content-Length", String.valueOf(1000));
+        httpHeaders.add("X-Upload-Content-Type", contentType);
+        httpHeaders.add("X-Upload-Content-Length", contentLength);
 
         HttpEntity<String> httpEntity = new HttpEntity<>(null, httpHeaders);
-        ResponseEntity<InitiateUploadResponseDTO> responseEntity = null;
+        ResponseEntity<InitiateUploadResponseDTO> responseEntity;
         try {
             responseEntity = restTemplate.exchange(initiateUploadUrl, HttpMethod.POST, httpEntity, InitiateUploadResponseDTO.class);
         } catch (HttpClientErrorException e) {

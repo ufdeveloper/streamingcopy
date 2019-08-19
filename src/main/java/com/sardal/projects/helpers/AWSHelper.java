@@ -4,6 +4,8 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.sardal.projects.helpers.dto.SourceObjectMetaData;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -26,13 +28,23 @@ public class AWSHelper {
 
     private AmazonS3 amazonS3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
 
-    public String createS3SignedUrl() throws URISyntaxException {
+    public SourceObjectMetaData createS3SignedUrl() throws URISyntaxException {
 
         Date s3UrlExpirationDate = Date.from(Instant.now().plusSeconds(Long.valueOf(s3ExpirationInSeconds)));
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(s3BucketName, s3FilePath);
         request.setExpiration(s3UrlExpirationDate);
         URL signedUrl = amazonS3Client.generatePresignedUrl(request);
         log.info("Successfully generated pre-signed url from s3, signedUrl={}", signedUrl);
-        return signedUrl.toString();
+
+        ObjectMetadata objectMetadata = amazonS3Client.getObjectMetadata(s3BucketName, s3FilePath);
+        Long contentLength = objectMetadata.getContentLength();
+        String contentType = objectMetadata.getContentType();
+
+        SourceObjectMetaData sourceObjectMetaData = new SourceObjectMetaData();
+        sourceObjectMetaData.setSignedUrl(signedUrl.toString());
+        sourceObjectMetaData.setContentLength(contentLength);
+        sourceObjectMetaData.setContentType(contentType);
+
+        return sourceObjectMetaData;
     }
 }
